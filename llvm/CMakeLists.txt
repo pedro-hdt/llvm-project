@@ -302,6 +302,7 @@ set(LLVM_ALL_TARGETS
   WebAssembly
   X86
   XCore
+  # TinyRISCV
   )
 
 # List of targets with JIT support:

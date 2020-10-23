@@ -1,0 +1,8 @@
+[common]
+subdirectories = MCTargetDesc TargetInfo
+
+[component_0]
+type = TargetGroup
+name = TinyRISCV
+parent = Target
+has_asmprinter = 1
