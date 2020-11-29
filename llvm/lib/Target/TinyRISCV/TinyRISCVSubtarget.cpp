@@ -1,6 +1,14 @@
+//===-- TinyRISCVSubtarget.cpp - TinyRISCV Subtarget Information ------------------===//
 //
-// Created by pedro-teixeira on 23/09/2020.
+// Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
+// See https://llvm.org/LICENSE.txt for license information.
+// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 //
+//===----------------------------------------------------------------------===//
+//
+// This file implements the TinyRISCV specific subclass of TargetSubtargetInfo.
+//
+//===----------------------------------------------------------------------===//
 
 #include "TinyRISCVSubtarget.h"
 #include "TinyRISCV.h"
@@ -10,7 +18,7 @@
 
 using namespace llvm;
 
-#define DEBUG_TYPE "tinyriscv-subtarget"
+#define DEBUG_TYPE "riscv-subtarget"
 
 #define GET_SUBTARGETINFO_TARGET_DESC
 #define GET_SUBTARGETINFO_CTOR
@@ -18,10 +26,43 @@ using namespace llvm;
 
 void TinyRISCVSubtarget::anchor() {}
 
+TinyRISCVSubtarget &TinyRISCVSubtarget::initializeSubtargetDependencies(
+    const Triple &TT, StringRef CPU, StringRef FS, StringRef ABIName) {
+  // Determine default and user-specified characteristics
+  bool Is64Bit = TT.isArch64Bit();
+  std::string CPUName = CPU;
+  if (CPUName.empty())
+    CPUName = "generic";
+  ParseSubtargetFeatures(CPUName, FS);
+  if (Is64Bit) {
+    XLenVT = MVT::i64;
+    XLen = 64;
+  }
+
+  TargetABI = TinyRISCVABI::computeTargetABI(TT, getFeatureBits(), ABIName);
+  TinyRISCVFeatures::validate(TT, getFeatureBits());
+  return *this;
+}
 
 TinyRISCVSubtarget::TinyRISCVSubtarget(const Triple &TT, StringRef CPU, StringRef FS,
-                           const TargetMachine &TM)
+                               StringRef ABIName, const TargetMachine &TM)
     : TinyRISCVGenSubtargetInfo(TT, CPU, FS),
-      InstrInfo(*this), RegInfo(), TLInfo(TM, *this), FrameLowering(*this) {
+      UserReservedRegister(TinyRISCV::NUM_TARGET_REGS),
+      FrameLowering(initializeSubtargetDependencies(TT, CPU, FS, ABIName)),
+      InstrInfo(*this), RegInfo(getHwMode()), TLInfo(TM, *this) {}
 
+const CallLowering *TinyRISCVSubtarget::getCallLowering() const {
+  return CallLoweringInfo.get();
+}
+
+InstructionSelector *TinyRISCVSubtarget::getInstructionSelector() const {
+  return InstSelector.get();
+}
+
+const LegalizerInfo *TinyRISCVSubtarget::getLegalizerInfo() const {
+  return Legalizer.get();
+}
+
+const RegisterBankInfo *TinyRISCVSubtarget::getRegBankInfo() const {
+  return RegBankInfo.get();
 }

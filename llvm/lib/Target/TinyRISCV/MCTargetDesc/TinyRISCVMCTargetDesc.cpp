@@ -1,28 +1,40 @@
+//===-- TinyRISCVMCTargetDesc.cpp - TinyRISCV Target Descriptions -----------------===//
 //
-// Created by pedro-teixeira on 23/09/2020.
+// Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
+// See https://llvm.org/LICENSE.txt for license information.
+// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 //
+//===----------------------------------------------------------------------===//
+///
+/// This file provides TinyRISCV-specific target descriptions.
+///
+//===----------------------------------------------------------------------===//
 
 #include "TinyRISCVMCTargetDesc.h"
-#include "MCTargetDesc/TinyRISCVInstPrinter.h"
+#include "TinyRISCVELFStreamer.h"
+#include "TinyRISCVInstPrinter.h"
 #include "TinyRISCVMCAsmInfo.h"
+#include "TinyRISCVTargetStreamer.h"
 #include "TargetInfo/TinyRISCVTargetInfo.h"
+#include "Utils/TinyRISCVBaseInfo.h"
+#include "llvm/ADT/STLExtras.h"
+#include "llvm/CodeGen/Register.h"
 #include "llvm/MC/MCAsmInfo.h"
 #include "llvm/MC/MCInstrInfo.h"
 #include "llvm/MC/MCRegisterInfo.h"
 #include "llvm/MC/MCStreamer.h"
 #include "llvm/MC/MCSubtargetInfo.h"
 #include "llvm/Support/ErrorHandling.h"
-#include "llvm/Support/FormattedStream.h"
 #include "llvm/Support/TargetRegistry.h"
 
 #define GET_INSTRINFO_MC_DESC
 #include "TinyRISCVGenInstrInfo.inc"
 
-#define GET_SUBTARGETINFO_MC_DESC
-#include "TinyRISCVGenSubtargetInfo.inc"
-
 #define GET_REGINFO_MC_DESC
 #include "TinyRISCVGenRegisterInfo.inc"
+
+#define GET_SUBTARGETINFO_MC_DESC
+#include "TinyRISCVGenSubtargetInfo.inc"
 
 using namespace llvm;
 
@@ -32,48 +44,56 @@ static MCInstrInfo *createTinyRISCVMCInstrInfo() {
   return X;
 }
 
-static MCRegisterInfo *createTinyRISCVMCRegisterInfo(StringRef TT) {
+static MCRegisterInfo *createTinyRISCVMCRegisterInfo(const Triple &TT) {
   MCRegisterInfo *X = new MCRegisterInfo();
-  InitTinyRISCVMCRegisterInfo(X, TinyRISCV::LR);
+  InitTinyRISCVMCRegisterInfo(X, TinyRISCV::X1);
   return X;
 }
 
-static MCAsmInfo *createTinyRISCVMCAsmInfo(const MCRegisterInfo &MRI, StringRef TT) {
+static MCAsmInfo *createTinyRISCVMCAsmInfo(const MCRegisterInfo &MRI,
+                                       const Triple &TT,
+                                       const MCTargetOptions &Options) {
   MCAsmInfo *MAI = new TinyRISCVMCAsmInfo(TT);
+
+  Register SP = MRI.getDwarfRegNum(TinyRISCV::X2, true);
+  MCCFIInstruction Inst = MCCFIInstruction::createDefCfa(nullptr, SP, 0);
+  MAI->addInitialFrameState(Inst);
+
   return MAI;
 }
 
-static MCSubtargetInfo *createTinyRISCVMCSubtargetInfo(const Triple TT,
-                                                 StringRef CPU, StringRef FS) {
-  return createTinyRISCVMCSubtargetInfoImpl(TT, CPU, FS);
+static MCSubtargetInfo *createTinyRISCVMCSubtargetInfo(const Triple &TT,
+                                                   StringRef CPU, StringRef FS) {
+  std::string CPUName = CPU;
+  if (CPUName.empty())
+    CPUName = "generic";
+  return createTinyRISCVMCSubtargetInfoImpl(TT, CPUName, FS);
 }
 
-static MCInstPrinter *
-createTinyRISCVMCInstPrinter(const Target &T, unsigned SyntaxVariant,
-                       const MCAsmInfo &MAI, const MCInstrInfo &MII,
-                       const MCRegisterInfo &MRI, const MCSubtargetInfo &STI) {
+static MCInstPrinter *createTinyRISCVMCInstPrinter(const Triple &T,
+                                               unsigned SyntaxVariant,
+                                               const MCAsmInfo &MAI,
+                                               const MCInstrInfo &MII,
+                                               const MCRegisterInfo &MRI) {
   return new TinyRISCVInstPrinter(MAI, MII, MRI);
 }
 
-static MCStreamer *
-createMCAsmStreamer(MCContext &Ctx, formatted_raw_ostream *OS,
-                    bool isVerboseAsm, bool useDwarfDirectory,
-                    MCInstPrinter *InstPrint, MCCodeEmitter *CE,
-                    MCAsmBackend *TAB, bool ShowInst) {
-  return createAsmStreamer(Ctx, OS, isVerboseAsm, useDwarfDirectory,
-                             InstPrint, CE, TAB, ShowInst);
+static MCTargetStreamer *
+createTinyRISCVObjectTargetStreamer(MCStreamer &S, const MCSubtargetInfo &STI) {
+  const Triple &TT = STI.getTargetTriple();
+  if (TT.isOSBinFormatELF())
+    return new TinyRISCVTargetELFStreamer(S, STI);
+  return nullptr;
 }
 
-static MCStreamer *createMCStreamer(const Target &T, StringRef TT,
-                                    MCContext &Ctx, MCAsmBackend &MAB,
-                                    raw_ostream &OS, MCCodeEmitter *Emitter,
-                                    const MCSubtargetInfo &STI, bool RelaxAll,
-                                    bool NoExecStack) {
-  return createELFStreamer(Ctx, MAB, OS, Emitter, false);
+static MCTargetStreamer *createTinyRISCVAsmTargetStreamer(MCStreamer &S,
+                                                      formatted_raw_ostream &OS,
+                                                      MCInstPrinter *InstPrint,
+                                                      bool isVerboseAsm) {
+  return new TinyRISCVTargetAsmStreamer(S, OS);
 }
 
-// Force static initialization.
-extern "C" void LLVMInitializeTinyRISCVTargetMC() {
+extern "C" LLVM_EXTERNAL_VISIBILITY void LLVMInitializeTinyRISCVTargetMC() {
   Target *T = &getTheTinyRISCVTarget();
   TargetRegistry::RegisterMCAsmInfo(*T, createTinyRISCVMCAsmInfo);
   TargetRegistry::RegisterMCInstrInfo(*T, createTinyRISCVMCInstrInfo);
@@ -82,8 +102,9 @@ extern "C" void LLVMInitializeTinyRISCVTargetMC() {
   TargetRegistry::RegisterMCCodeEmitter(*T, createTinyRISCVMCCodeEmitter);
   TargetRegistry::RegisterMCInstPrinter(*T, createTinyRISCVMCInstPrinter);
   TargetRegistry::RegisterMCSubtargetInfo(*T, createTinyRISCVMCSubtargetInfo);
-  // Do not create object file streamer
+  TargetRegistry::RegisterObjectTargetStreamer(
+      *T, createTinyRISCVObjectTargetStreamer);
 
   // Register the asm target streamer.
-  TargetRegistry::RegisterAsmTargetStreamer(*T, createMCAsmStreamer);
+  TargetRegistry::RegisterAsmTargetStreamer(*T, createTinyRISCVAsmTargetStreamer);
 }

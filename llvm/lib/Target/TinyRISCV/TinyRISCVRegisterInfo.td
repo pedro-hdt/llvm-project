@@ -37,7 +37,7 @@ def X29 : TinyRISCVReg<29,"x29", ["t4"]>, DwarfRegNum<[29]>;
 def X30 : TinyRISCVReg<30,"x30", ["t5"]>, DwarfRegNum<[30]>;
 def X31 : TinyRISCVReg<31,"x31", ["t6"]>, DwarfRegNum<[31]>;
 
-def GPR : RegisterClass<"RISCV", [i32], 32, (add
+def GPR : RegisterClass<"TinyRISCV", [i32], 32, (add
     (sequence "X%u", 10, 17),
     (sequence "X%u", 5, 7),
     (sequence "X%u", 28, 31),

@@ -3,14 +3,17 @@ class InstFormat<bits<5> val> {
   bits<5> Value = val;
 }
 
+def InstFormatPseudo : InstFormat<0>;
 def InstFormatR      : InstFormat<1>;
 def InstFormatI      : InstFormat<3>;
 def InstFormatS      : InstFormat<4>;
+def InstFormatU      : InstFormat<6>;
 def InstFormatJ      : InstFormat<7>;
 
 class TinyRISCVOpcode<bits<7> val> {
   bits<7> Value = val;
 }
+
 def OPC_LOAD      : TinyRISCVOpcode<0b0000011>;
 def OPC_LOAD_FP   : TinyRISCVOpcode<0b0000111>;
 def OPC_MISC_MEM  : TinyRISCVOpcode<0b0001111>;
@@ -38,6 +41,12 @@ class TRVInst<dag outs, dag ins, string opcodestr, string argstr,
     : Instruction {
     field bits<32> Inst;
     let Size = 4;
+
+    // SoftFail is a field the disassembler can use to provide a way for
+    // instructions to not match without killing the whole decode process. It is
+    // mainly used for ARM, but Tablegen expects this field to exist or it fails
+    // to build the decode table.
+    field bits<32> SoftFail = 0;
 
     bits<7> Opcode = 0;
 
@@ -109,4 +118,22 @@ class TRVInstJ<TinyRISCVOpcode opcode, dag outs, dag ins, string opcodestr,
   let Inst{19-12} = imm20{18-11};
   let Inst{11-7} = rd;
   let Opcode = opcode.Value;
+}
+
+class TRVInstU<TinyRISCVOpcode opcode, dag outs, dag ins, string opcodestr,
+              string argstr>
+    : TRVInst<outs, ins, opcodestr, argstr, [], InstFormatU> {
+  bits<20> imm20;
+  bits<5> rd;
+
+  let Inst{31-12} = imm20;
+  let Inst{11-7} = rd;
+  let Opcode = opcode.Value;
+}
+
+// pseudo instructions format
+class TRVInstPseudo<dag outs, dag ins, list<dag> pattern, string opcodestr="", string argstr="">
+    : TRVInst<outs, ins, opcodestr, argstr, pattern, InstFormatPseudo> {
+  let isPseudo = 1;
+  let isCodeGenOnly = 1;
 }

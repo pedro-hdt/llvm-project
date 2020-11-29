@@ -1,6 +1,14 @@
+//===-- TinyRISCVFrameLowering.h - Define frame lowering for TinyRISCV -*- C++ -*--===//
 //
-// Created by pedro-teixeira on 20/09/2020.
+// Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
+// See https://llvm.org/LICENSE.txt for license information.
+// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 //
+//===----------------------------------------------------------------------===//
+//
+// This class implements TinyRISCV-specific bits of TargetFrameLowering class.
+//
+//===----------------------------------------------------------------------===//
 
 #ifndef LLVM_LIB_TARGET_TinyRISCV_TinyRISCVFRAMELOWERING_H
 #define LLVM_LIB_TARGET_TinyRISCV_TinyRISCVFRAMELOWERING_H
@@ -21,17 +29,37 @@ public:
   void emitPrologue(MachineFunction &MF, MachineBasicBlock &MBB) const override;
   void emitEpilogue(MachineFunction &MF, MachineBasicBlock &MBB) const override;
 
+  int getFrameIndexReference(const MachineFunction &MF, int FI,
+                             unsigned &FrameReg) const override;
 
-  static unsigned materializeOffset(MachineFunction &MF,
-                                    MachineBasicBlock &MBB,
-                                    MachineBasicBlock::iterator MBBI,
-                                    unsigned int Offset);
-  uint64_t computeStackSize(MachineFunction &MF) const;
-  bool hasFP(const MachineFunction &MF) const override { return false; };
+  void determineCalleeSaves(MachineFunction &MF, BitVector &SavedRegs,
+                            RegScavenger *RS) const override;
+
+  void processFunctionBeforeFrameFinalized(MachineFunction &MF,
+                                           RegScavenger *RS) const override;
+
+  bool hasFP(const MachineFunction &MF) const override;
+
+  bool hasBP(const MachineFunction &MF) const;
+
+  bool hasReservedCallFrame(const MachineFunction &MF) const override;
+  MachineBasicBlock::iterator
+  eliminateCallFramePseudoInstr(MachineFunction &MF, MachineBasicBlock &MBB,
+                                MachineBasicBlock::iterator MI) const override;
+
+  // Get the first stack adjustment amount for SplitSPAdjust.
+  // Return 0 if we don't want to to split the SP adjustment in prologue and
+  // epilogue.
+  uint64_t getFirstSPAdjustAmount(const MachineFunction &MF) const;
 
 protected:
   const TinyRISCVSubtarget &STI;
+
+private:
+  void determineFrameLayout(MachineFunction &MF) const;
+  void adjustReg(MachineBasicBlock &MBB, MachineBasicBlock::iterator MBBI,
+                 const DebugLoc &DL, Register DestReg, Register SrcReg,
+                 int64_t Val, MachineInstr::MIFlag Flag) const;
 };
 }
-
-#endif // LLVM_LIB_TARGET_TinyRISCV_TinyRISCVFRAMELOWERING_H
+#endif

@@ -1,23 +1,51 @@
+//===-- TinyRISCV.h - Top-level interface for TinyRISCV -----------------*- C++ -*-===//
 //
-// Created by pedro-teixeira on 23/09/2020.
+// Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
+// See https://llvm.org/LICENSE.txt for license information.
+// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 //
+//===----------------------------------------------------------------------===//
+//
+// This file contains the entry points for global functions defined in the LLVM
+// RISC-V back-end.
+//
+//===----------------------------------------------------------------------===//
 
-#ifndef LLVM_LIB_TARGET_TinyRISCV_H
-#define LLVM_LIB_TARGET_TinyRISCV_H
+#ifndef LLVM_LIB_TARGET_TinyRISCV_TinyRISCV_H
+#define LLVM_LIB_TARGET_TinyRISCV_TinyRISCV_H
 
-#include "MCTargetDesc/TinyRISCVMCTargetDesc.h"
+#include "Utils/TinyRISCVBaseInfo.h"
 #include "llvm/Target/TargetMachine.h"
-namespace llvm {
-class TargetMachine;
-class TinyRISCVTargetMachine;
 
-FunctionPass *createTinyRISCVISelDag(TinyRISCVTargetMachine &TM);
+namespace llvm {
+class TinyRISCVRegisterBankInfo;
+class TinyRISCVSubtarget;
+class TinyRISCVTargetMachine;
+class AsmPrinter;
+class FunctionPass;
+class InstructionSelector;
+class MCInst;
+class MCOperand;
+class MachineInstr;
+class MachineOperand;
+class PassRegistry;
 
 void LowerTinyRISCVMachineInstrToMCInst(const MachineInstr *MI, MCInst &OutMI,
                                     const AsmPrinter &AP);
 bool LowerTinyRISCVMachineOperandToMCOperand(const MachineOperand &MO,
                                          MCOperand &MCOp, const AsmPrinter &AP);
 
-} // end namespace llvm;
+FunctionPass *createTinyRISCVISelDag(TinyRISCVTargetMachine &TM);
 
-#endif // LLVM_LIB_TARGET_TinyRISCV_H
+FunctionPass *createTinyRISCVMergeBaseOffsetOptPass();
+void initializeTinyRISCVMergeBaseOffsetOptPass(PassRegistry &);
+
+FunctionPass *createTinyRISCVExpandPseudoPass();
+void initializeTinyRISCVExpandPseudoPass(PassRegistry &);
+
+InstructionSelector *createTinyRISCVInstructionSelector(const TinyRISCVTargetMachine &,
+                                                    TinyRISCVSubtarget &,
+                                                    TinyRISCVRegisterBankInfo &);
+}
+
+#endif

@@ -32,14 +32,13 @@ def : Proc<"generic", []>;
 // Declare the target which we are implementing
 //===----------------------------------------------------------------------===//
 
-def TinyRISCVAsmWriter : AsmWriter {
-  string AsmWriterClassName  = "InstPrinter";
-  int PassSubtarget = 1;
-  int Variant = 0;
+def TinyRISCVAsmParser : AsmParser {
+  let ShouldEmitMatchRegisterAltName = 1;
+  let AllowDuplicateRegisterNames = 1;
 }
 
 def TinyRISCV : Target {
   // Pull in Instruction Info:
   let InstructionSet = TinyRISCVInstrInfo;
-  let AssemblyWriters = [TinyRISCVAsmWriter];
+  let AssemblyParsers = [TinyRISCVAsmParser];
 }

@@ -1,6 +1,10 @@
+//===-- TinyRISCVTargetObjectFile.h - TinyRISCV Object Info -*- C++ ---------*-===//
 //
-// Created by pedro-teixeira on 04/10/2020.
+// Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
+// See https://llvm.org/LICENSE.txt for license information.
+// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 //
+//===----------------------------------------------------------------------===//
 
 #ifndef LLVM_LIB_TARGET_TinyRISCV_TinyRISCVTARGETOBJECTFILE_H
 #define LLVM_LIB_TARGET_TinyRISCV_TinyRISCVTARGETOBJECTFILE_H
@@ -10,6 +14,7 @@
 namespace llvm {
 class TinyRISCVTargetMachine;
 
+/// This implementation is used for TinyRISCV ELF targets.
 class TinyRISCVELFTargetObjectFile : public TargetLoweringObjectFileELF {
   MCSection *SmallDataSection;
   MCSection *SmallBSSSection;
@@ -37,6 +42,7 @@ public:
 
   bool isInSmallSection(uint64_t Size) const;
 };
+
 } // end namespace llvm
 
-#endif // LLVM_LIB_TARGET_TinyRISCV_TinyRISCVTARGETOBJECTFILE_H
+#endif

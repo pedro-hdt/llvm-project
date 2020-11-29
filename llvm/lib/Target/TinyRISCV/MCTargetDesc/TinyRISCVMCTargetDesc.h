@@ -1,42 +1,58 @@
+//===-- TinyRISCVMCTargetDesc.h - TinyRISCV Target Descriptions ---------*- C++ -*-===//
 //
-// Created by pedro-teixeira on 23/09/2020.
+// Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
+// See https://llvm.org/LICENSE.txt for license information.
+// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 //
+//===----------------------------------------------------------------------===//
+//
+// This file provides TinyRISCV specific target descriptions.
+//
+//===----------------------------------------------------------------------===//
 
 #ifndef LLVM_LIB_TARGET_TinyRISCV_MCTARGETDESC_TinyRISCVMCTARGETDESC_H
 #define LLVM_LIB_TARGET_TinyRISCV_MCTARGETDESC_TinyRISCVMCTARGETDESC_H
 
+#include "llvm/Config/config.h"
+#include "llvm/MC/MCTargetOptions.h"
 #include "llvm/Support/DataTypes.h"
-#include <llvm/CodeGen/AsmPrinter.h>
+#include <memory>
+
 namespace llvm {
-class Target;
+class MCAsmBackend;
+class MCCodeEmitter;
+class MCContext;
 class MCInstrInfo;
+class MCObjectTargetWriter;
 class MCRegisterInfo;
 class MCSubtargetInfo;
-class MCContext;
-class MCCodeEmitter;
-class MCAsmInfo;
-class MCCodeGenInfo;
-class MCInstPrinter;
-class MCObjectWriter;
-class MCAsmBackend;
 class StringRef;
+class Target;
+class Triple;
 class raw_ostream;
-extern Target TheTinyRISCVTarget;
+class raw_pwrite_stream;
 
 MCCodeEmitter *createTinyRISCVMCCodeEmitter(const MCInstrInfo &MCII,
-                                      const MCRegisterInfo &MRI,
-                                      MCContext &Ctx);
-void LowerTinyRISCVMachineInstrToMCInst(const MachineInstr *MI, MCInst &OutMI,
-                                  const llvm::AsmPrinter &AP);
-} // end namespace llvm
+                                        const MCRegisterInfo &MRI,
+                                        MCContext &Ctx);
 
+MCAsmBackend *createTinyRISCVAsmBackend(const Target &T, const MCSubtargetInfo &STI,
+                                    const MCRegisterInfo &MRI,
+                                    const MCTargetOptions &Options);
+
+std::unique_ptr<MCObjectTargetWriter> createTinyRISCVELFObjectWriter(uint8_t OSABI,
+                                                                 bool Is64Bit);
+}
+
+// Defines symbolic names for RISC-V registers.
 #define GET_REGINFO_ENUM
 #include "TinyRISCVGenRegisterInfo.inc"
 
+// Defines symbolic names for RISC-V instructions.
 #define GET_INSTRINFO_ENUM
 #include "TinyRISCVGenInstrInfo.inc"
 
 #define GET_SUBTARGETINFO_ENUM
 #include "TinyRISCVGenSubtargetInfo.inc"
 
-#endif // LLVM_LIB_TARGET_TinyRISCV_MCTARGETDESC_TinyRISCVMCTARGETDESC_H
+#endif

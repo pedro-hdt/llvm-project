@@ -1,9 +1,13 @@
+//===-- TinyRISCVTargetInfo.h - TinyRISCV Target Implementation ---------*- C++ -*-===//
 //
-// Created by pedro-teixeira on 28/09/2020.
+// Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
+// See https://llvm.org/LICENSE.txt for license information.
+// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 //
+//===----------------------------------------------------------------------===//
 
-#ifndef LLVM_LIB_TARGET_TARGETINFO_TinyRISCVTARGETINFO_H
-#define LLVM_LIB_TARGET_TARGETINFO_TinyRISCVTARGETINFO_H
+#ifndef LLVM_LIB_TARGET_TinyRISCV_TARGETINFO_TinyRISCVTARGETINFO_H
+#define LLVM_LIB_TARGET_TinyRISCV_TARGETINFO_TinyRISCVTARGETINFO_H
 
 namespace llvm {
 
@@ -13,4 +17,4 @@ Target &getTheTinyRISCVTarget();
 
 } // namespace llvm
 
-#endif // LLVM_LIB_TARGET_TARGETINFO_TinyRISCVTARGETINFO_H
+#endif // LLVM_LIB_TARGET_TinyRISCV_TARGETINFO_TinyRISCVTARGETINFO_H

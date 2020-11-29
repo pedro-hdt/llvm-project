@@ -1,9 +1,11 @@
 add_llvm_component_library(LLVMTinyRISCVDesc
   TinyRISCVAsmBackend.cpp
+  TinyRISCVELFObjectWriter.cpp
   TinyRISCVInstPrinter.cpp
   TinyRISCVMCAsmInfo.cpp
   TinyRISCVMCCodeEmitter.cpp
   TinyRISCVMCExpr.cpp
   TinyRISCVMCTargetDesc.cpp
   TinyRISCVTargetStreamer.cpp
+  TinyRISCVELFStreamer.cpp
 )
