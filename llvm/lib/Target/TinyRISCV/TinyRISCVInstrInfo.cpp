@@ -80,13 +80,8 @@ void TinyRISCVInstrInfo::copyPhysReg(MachineBasicBlock &MBB,
     return;
   }
 
-  // FPR->FPR copies
-  unsigned Opc;
   llvm_unreachable("Impossible reg-to-reg copy");
 
-  BuildMI(MBB, MBBI, DL, get(Opc), DstReg)
-      .addReg(SrcReg, getKillRegState(KillSrc))
-      .addReg(SrcReg, getKillRegState(KillSrc));
 }
 
 void TinyRISCVInstrInfo::storeRegToStackSlot(MachineBasicBlock &MBB,
@@ -127,7 +122,9 @@ void TinyRISCVInstrInfo::loadRegFromStackSlot(MachineBasicBlock &MBB,
   else
     llvm_unreachable("Can't load this register from stack slot");
 
-  BuildMI(MBB, I, DL, get(Opcode), DstReg).addFrameIndex(FI).addImm(0);
+  BuildMI(MBB, I, DL, get(Opcode), DstReg)
+      .addFrameIndex(FI)
+      .addImm(0);
 }
 
 void TinyRISCVInstrInfo::movImm(MachineBasicBlock &MBB,

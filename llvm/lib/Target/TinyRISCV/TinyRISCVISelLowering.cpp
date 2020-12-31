@@ -116,15 +116,15 @@ TinyRISCVTargetLowering::TinyRISCVTargetLowering(const TargetMachine &TM,
     setOperationAction(ISD::SRL, MVT::i32, Custom);
   }
 
-  if (!Subtarget.hasStdExtM()) {
-    setOperationAction(ISD::MUL, XLenVT, Expand);
-    setOperationAction(ISD::MULHS, XLenVT, Expand);
-    setOperationAction(ISD::MULHU, XLenVT, Expand);
-    setOperationAction(ISD::SDIV, XLenVT, Expand);
-    setOperationAction(ISD::UDIV, XLenVT, Expand);
-    setOperationAction(ISD::SREM, XLenVT, Expand);
-    setOperationAction(ISD::UREM, XLenVT, Expand);
-  }
+//  if (!Subtarget.hasStdExtM()) {
+//    setOperationAction(ISD::MUL, XLenVT, Expand);
+//    setOperationAction(ISD::MULHS, XLenVT, Expand);
+//    setOperationAction(ISD::MULHU, XLenVT, Expand);
+//    setOperationAction(ISD::SDIV, XLenVT, Expand);
+//    setOperationAction(ISD::UDIV, XLenVT, Expand);
+//    setOperationAction(ISD::SREM, XLenVT, Expand);
+//    setOperationAction(ISD::UREM, XLenVT, Expand);
+//  }
 
   if (Subtarget.is64Bit() && Subtarget.hasStdExtM()) {
     setOperationAction(ISD::MUL, MVT::i32, Custom);
@@ -1384,6 +1384,8 @@ TinyRISCVTargetLowering::EmitInstrWithCustomInserter(MachineInstr &MI,
 //    return emitSplitF64Pseudo(MI, BB);
   }
 }
+
+#include "TinyRISCVGenCallingConv.inc"
 
 // Calling Convention Implementation.
 // The expectations for frontend ABI lowering vary from target to target.

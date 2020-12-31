@@ -96,63 +96,6 @@ enum FenceField {
 };
 }
 
-// Describes the supported floating point rounding mode encodings.
-namespace TinyRISCVFPRndMode {
-enum RoundingMode {
-  RNE = 0,
-  RTZ = 1,
-  RDN = 2,
-  RUP = 3,
-  RMM = 4,
-  DYN = 7,
-  Invalid
-};
-
-inline static StringRef roundingModeToString(RoundingMode RndMode) {
-  switch (RndMode) {
-  default:
-    llvm_unreachable("Unknown floating point rounding mode");
-  case TinyRISCVFPRndMode::RNE:
-    return "rne";
-  case TinyRISCVFPRndMode::RTZ:
-    return "rtz";
-  case TinyRISCVFPRndMode::RDN:
-    return "rdn";
-  case TinyRISCVFPRndMode::RUP:
-    return "rup";
-  case TinyRISCVFPRndMode::RMM:
-    return "rmm";
-  case TinyRISCVFPRndMode::DYN:
-    return "dyn";
-  }
-}
-
-inline static RoundingMode stringToRoundingMode(StringRef Str) {
-  return StringSwitch<RoundingMode>(Str)
-      .Case("rne", TinyRISCVFPRndMode::RNE)
-      .Case("rtz", TinyRISCVFPRndMode::RTZ)
-      .Case("rdn", TinyRISCVFPRndMode::RDN)
-      .Case("rup", TinyRISCVFPRndMode::RUP)
-      .Case("rmm", TinyRISCVFPRndMode::RMM)
-      .Case("dyn", TinyRISCVFPRndMode::DYN)
-      .Default(TinyRISCVFPRndMode::Invalid);
-}
-
-inline static bool isValidRoundingMode(unsigned Mode) {
-  switch (Mode) {
-  default:
-    return false;
-  case TinyRISCVFPRndMode::RNE:
-  case TinyRISCVFPRndMode::RTZ:
-  case TinyRISCVFPRndMode::RDN:
-  case TinyRISCVFPRndMode::RUP:
-  case TinyRISCVFPRndMode::RMM:
-  case TinyRISCVFPRndMode::DYN:
-    return true;
-  }
-}
-} // namespace TinyRISCVFPRndMode
-
 namespace TinyRISCVSysReg {
 struct SysReg {
   const char *Name;

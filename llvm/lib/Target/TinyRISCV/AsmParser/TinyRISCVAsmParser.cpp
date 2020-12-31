@@ -358,20 +358,6 @@ public:
     return true;
   }
 
-  /// Return true if the operand is a valid floating point rounding mode.
-  bool isFRMArg() const {
-    if (!isImm())
-      return false;
-    const MCExpr *Val = getImm();
-    auto *SVal = dyn_cast<MCSymbolRefExpr>(Val);
-    if (!SVal || SVal->getKind() != MCSymbolRefExpr::VK_None)
-      return false;
-
-    StringRef Str = SVal->getSymbol().getName();
-
-    return TinyRISCVFPRndMode::stringToRoundingMode(Str) != TinyRISCVFPRndMode::Invalid;
-  }
-
   bool isImmXLenLI() const {
     int64_t Imm;
     TinyRISCVMCExpr::VariantKind VK = TinyRISCVMCExpr::VK_TinyRISCV_None;
@@ -725,22 +711,6 @@ public:
   void addCSRSystemRegisterOperands(MCInst &Inst, unsigned N) const {
     assert(N == 1 && "Invalid number of operands!");
     Inst.addOperand(MCOperand::createImm(SysReg.Encoding));
-  }
-
-  // Returns the rounding mode represented by this TinyRISCVOperand. Should only
-  // be called after checking isFRMArg.
-  TinyRISCVFPRndMode::RoundingMode getRoundingMode() const {
-    // isFRMArg has validated the operand, meaning this cast is safe.
-    auto SE = cast<MCSymbolRefExpr>(getImm());
-    TinyRISCVFPRndMode::RoundingMode FRM =
-        TinyRISCVFPRndMode::stringToRoundingMode(SE->getSymbol().getName());
-    assert(FRM != TinyRISCVFPRndMode::Invalid && "Invalid rounding mode");
-    return FRM;
-  }
-
-  void addFRMArgOperands(MCInst &Inst, unsigned N) const {
-    assert(N == 1 && "Invalid number of operands!");
-    Inst.addOperand(MCOperand::createImm(getRoundingMode()));
   }
 };
 } // end anonymous namespace.

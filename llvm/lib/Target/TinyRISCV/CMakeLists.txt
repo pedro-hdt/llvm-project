@@ -2,6 +2,7 @@ set(LLVM_TARGET_DEFINITIONS TinyRISCV.td)
 
 tablegen(LLVM TinyRISCVGenAsmMatcher.inc -gen-asm-matcher)
 tablegen(LLVM TinyRISCVGenAsmWriter.inc -gen-asm-writer)
+tablegen(LLVM TinyRISCVGenCallingConv.inc -gen-callingconv)
 tablegen(LLVM TinyRISCVGenDAGISel.inc -gen-dag-isel)
 tablegen(LLVM TinyRISCVGenDisassemblerTables.inc -gen-disassembler)
 tablegen(LLVM TinyRISCVGenGlobalISel.inc -gen-global-isel)
@@ -31,7 +32,6 @@ add_llvm_target(TinyRISCVCodeGen
   )
 
 add_subdirectory(AsmParser)
-add_subdirectory(Disassembler)
 add_subdirectory(MCTargetDesc)
 add_subdirectory(TargetInfo)
 add_subdirectory(Utils)

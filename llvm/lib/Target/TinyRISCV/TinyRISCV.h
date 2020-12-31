@@ -18,12 +18,10 @@
 #include "llvm/Target/TargetMachine.h"
 
 namespace llvm {
-class TinyRISCVRegisterBankInfo;
 class TinyRISCVSubtarget;
 class TinyRISCVTargetMachine;
 class AsmPrinter;
 class FunctionPass;
-class InstructionSelector;
 class MCInst;
 class MCOperand;
 class MachineInstr;
@@ -43,9 +41,6 @@ void initializeTinyRISCVMergeBaseOffsetOptPass(PassRegistry &);
 FunctionPass *createTinyRISCVExpandPseudoPass();
 void initializeTinyRISCVExpandPseudoPass(PassRegistry &);
 
-InstructionSelector *createTinyRISCVInstructionSelector(const TinyRISCVTargetMachine &,
-                                                    TinyRISCVSubtarget &,
-                                                    TinyRISCVRegisterBankInfo &);
 }
 
 #endif

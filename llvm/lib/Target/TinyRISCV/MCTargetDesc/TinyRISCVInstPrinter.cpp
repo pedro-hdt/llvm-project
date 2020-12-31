@@ -110,13 +110,6 @@ void TinyRISCVInstPrinter::printFenceArg(const MCInst *MI, unsigned OpNo,
     O << "unknown";
 }
 
-void TinyRISCVInstPrinter::printFRMArg(const MCInst *MI, unsigned OpNo,
-                                   const MCSubtargetInfo &STI, raw_ostream &O) {
-  auto FRMArg =
-      static_cast<TinyRISCVFPRndMode::RoundingMode>(MI->getOperand(OpNo).getImm());
-  O << TinyRISCVFPRndMode::roundingModeToString(FRMArg);
-}
-
 void TinyRISCVInstPrinter::printAtomicMemOp(const MCInst *MI, unsigned OpNo,
                                         const MCSubtargetInfo &STI,
                                         raw_ostream &O) {

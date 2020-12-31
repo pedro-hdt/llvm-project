@@ -15,7 +15,7 @@
 ;===------------------------------------------------------------------------===;
 
 [common]
-subdirectories = AsmParser Disassembler TargetInfo MCTargetDesc Utils
+subdirectories = AsmParser TargetInfo MCTargetDesc Utils
 
 [component_0]
 type = TargetGroup

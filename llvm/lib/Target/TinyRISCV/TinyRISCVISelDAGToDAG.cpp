@@ -21,7 +21,7 @@
 #include "llvm/Support/raw_ostream.h"
 using namespace llvm;
 
-#define DEBUG_TYPE "riscv-isel"
+#define DEBUG_TYPE "tinyriscv-isel"
 
 // TinyRISCV-specific code to select TinyRISCV machine instructions for
 // SelectionDAG operations.
