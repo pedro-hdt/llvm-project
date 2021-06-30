@@ -23,10 +23,7 @@ def TinyRISCVInstrInfo : InstrInfo;
 // TinyRISCV processors supported.
 //===----------------------------------------------------------------------===//
 
-class Proc<string Name, list<SubtargetFeature> Features>
- : Processor<Name, NoItineraries, Features>;
-
-def : Proc<"generic", []>;
+def : Processor<"generic", NoItineraries, []>;
 
 //===----------------------------------------------------------------------===//
 // Declare the target which we are implementing

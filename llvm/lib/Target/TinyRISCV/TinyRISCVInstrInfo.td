@@ -4,7 +4,8 @@ include "TinyRISCVInstrFormats.td"
 // Type requirements and profiles
 //===----------------------------------------------------------------------===//
 
-def SDT_TinyRISCVCallSeqStart : SDCallSeqStart<[ SDTCisVT<0, i32> ]>;
+def SDT_TinyRISCVCallSeqStart : SDCallSeqStart<[SDTCisVT<0, i32>,
+                                                SDTCisVT<1, i32>]>;
 
 def SDT_TinyRISCVCallSeqEnd   : SDCallSeqEnd<[SDTCisVT<0, i32>,
                                               SDTCisVT<1, i32>]>;
@@ -12,8 +13,8 @@ def SDT_TinyRISCVCallSeqEnd   : SDCallSeqEnd<[SDTCisVT<0, i32>,
 def SDT_TinyRISCVCall : SDTypeProfile<0, -1, [SDTCisVT<0, i32>]>;
 
 def SDT_TinyRISCVSelectCC : SDTypeProfile<1, 5, [SDTCisSameAs<1, 2>,
-                                             SDTCisSameAs<0, 4>,
-                                             SDTCisSameAs<4, 5>]>;
+                                                 SDTCisSameAs<0, 4>,
+                                                 SDTCisSameAs<4, 5>]>;
 
 //===----------------------------------------------------------------------===//
 // Generic nodes with target-specific formats
@@ -28,8 +29,7 @@ def callseq_end   : SDNode<"ISD::CALLSEQ_END",   SDT_TinyRISCVCallSeqEnd,
 // Custom SDNodes.
 //===----------------------------------------------------------------------===//
 
-def tinyriscv_call
-    : SDNode<"TinyRISCVISD::CALL", SDT_TinyRISCVCall,
+def tinyriscv_call : SDNode<"TinyRISCVISD::CALL", SDT_TinyRISCVCall,
              [ SDNPHasChain, SDNPOptInGlue, SDNPOutGlue, SDNPVariadic ]>;
 
 def tinyriscv_ret_flag  : SDNode<"TinyRISCVISD::RET_FLAG", SDTNone,
@@ -247,7 +247,7 @@ def JALR : TRVInstI<0b000, OPC_JALR, (outs GPR:$rd),
 
 //===----------------------------------------------------------------------===//
 // Pattern Definitions for Instruction Selection
-//===----------------------------------------------------------------------===
+//===----------------------------------------------------------------------===//
 
 // for materializing immediate values
 def : Pat<(simm12:$imm), (ADDI X0, simm12:$imm)>;

@@ -98,19 +98,6 @@ public:
     assert(i < TinyRISCV::NUM_TARGET_REGS && "Register out of range");
     return UserReservedRegister[i];
   }
-
-protected:
-  // GlobalISel related APIs.
-  std::unique_ptr<CallLowering> CallLoweringInfo;
-  std::unique_ptr<InstructionSelector> InstSelector;
-  std::unique_ptr<LegalizerInfo> Legalizer;
-  std::unique_ptr<RegisterBankInfo> RegBankInfo;
-
-public:
-  const CallLowering *getCallLowering() const override;
-  InstructionSelector *getInstructionSelector() const override;
-  const LegalizerInfo *getLegalizerInfo() const override;
-  const RegisterBankInfo *getRegBankInfo() const override;
 };
 } // End llvm namespace
 

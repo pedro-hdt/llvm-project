@@ -10,5 +10,7 @@ int main(int argc, char *argv[]) {
   int a = 7;
   int b = a * argc;
   b++;
-  return b + test();
+  if (argc > 2)
+    return b + test();
+  return 8;
 }

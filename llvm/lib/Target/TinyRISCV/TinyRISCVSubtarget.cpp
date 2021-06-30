@@ -18,7 +18,7 @@
 
 using namespace llvm;
 
-#define DEBUG_TYPE "riscv-subtarget"
+#define DEBUG_TYPE "tinyriscv-subtarget"
 
 #define GET_SUBTARGETINFO_TARGET_DESC
 #define GET_SUBTARGETINFO_CTOR
@@ -50,19 +50,3 @@ TinyRISCVSubtarget::TinyRISCVSubtarget(const Triple &TT, StringRef CPU, StringRe
       UserReservedRegister(TinyRISCV::NUM_TARGET_REGS),
       FrameLowering(initializeSubtargetDependencies(TT, CPU, FS, ABIName)),
       InstrInfo(*this), RegInfo(getHwMode()), TLInfo(TM, *this) {}
-
-const CallLowering *TinyRISCVSubtarget::getCallLowering() const {
-  return CallLoweringInfo.get();
-}
-
-InstructionSelector *TinyRISCVSubtarget::getInstructionSelector() const {
-  return InstSelector.get();
-}
-
-const LegalizerInfo *TinyRISCVSubtarget::getLegalizerInfo() const {
-  return Legalizer.get();
-}
-
-const RegisterBankInfo *TinyRISCVSubtarget::getRegBankInfo() const {
-  return RegBankInfo.get();
-}
